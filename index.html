@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
+  </head>
+  <body>
+    <canvas id="canvas_input" style="top: 50vh;"></canvas>
+    <h1>Вал для вырезки окружности/овала</h1>
+    <h3>Введите ваши данные, измените линии окружности, и посмотрите на 3D модель вашего вала</h3>
+    <h5><s>Скачайте шаблон для вырезки по металу</s> (в разработке)</h5>
+    <form>
+      Высота: <input type="text" id="height" name="height" value="50"/> см <br/>
+      Ширина: <input type="text" id="width" name="width" value="30"/> см <br/>
+      Ширина ножа: <input type="text" id="blade_depth" name="blade_depth" value="1"/> см <br/>
+      <input type="submit" value="Изменить размер"/>
+    </form>
+    <canvas id="canvas3d" style="top: 50vh; left:50vw;"></canvas>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
