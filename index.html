@@ -1,23 +1,110 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><ellipse cx='16' cy='16' rx='14' ry='10' fill='%23e8c98e' stroke='%23ff8a3d' stroke-width='3'/></svg>" />
+    <title>BreadBlade — нож-ролик для лаваша</title>
   </head>
   <body>
-    <canvas id="canvas_input" style="top: 50vh;"></canvas>
-    <h1>Вал для вырезки окружности/овала</h1>
-    <h3>Введите ваши данные, измените линии окружности, и посмотрите на 3D модель вашего вала</h3>
-    <h5><s>Скачайте шаблон для вырезки по металу</s> (в разработке)</h5>
-    <form>
-      Высота: <input type="text" id="height" name="height" value="50"/> см <br/>
-      Ширина: <input type="text" id="width" name="width" value="30"/> см <br/>
-      Ширина ножа: <input type="text" id="blade_depth" name="blade_depth" value="1"/> см <br/>
-      <input type="submit" value="Изменить размер"/>
-    </form>
-    <canvas id="canvas3d" style="top: 50vh; left:50vw;"></canvas>
-    <script type="module" src="/src/main.js"></script>
+    <div id="app">
+      <aside class="panel">
+        <header class="brand">
+          <div class="logo"></div>
+          <div>
+            <h1>BreadBlade</h1>
+            <p>трафарет ножа-ролика для лаваша</p>
+          </div>
+        </header>
+
+        <section class="group">
+          <h2>Лаваш</h2>
+          <div class="seg" id="shape">
+            <button data-v="oval">Овал</button>
+            <button data-v="rect">Прямоугольник</button>
+            <button data-v="custom">Свой</button>
+          </div>
+          <div id="f-length"></div>
+          <div id="f-width"></div>
+          <div id="f-squareness" data-shape="oval"></div>
+          <div id="f-cornerRadius" data-shape="rect"></div>
+          <p class="hint" data-shape="custom">Тащите оранжевые точки на вкладке «Контур». Двойной клик — новая точка, правый клик — удалить.</p>
+        </section>
+
+        <section class="group">
+          <h2>Ролик</h2>
+          <div id="f-perRev"></div>
+          <div id="f-gap"></div>
+          <div id="f-margin"></div>
+        </section>
+
+        <section class="group">
+          <h2>Лезвие</h2>
+          <div id="f-bladeHeight"></div>
+          <div id="f-embed"></div>
+          <div id="f-thickness"></div>
+          <label class="lbl">Развёртка на частей</label>
+          <div class="seg" id="split">
+            <button data-v="0">Авто</button>
+            <button data-v="1">1</button>
+            <button data-v="2">2</button>
+            <button data-v="4">4</button>
+            <button data-v="8">8</button>
+          </div>
+        </section>
+
+        <section class="group">
+          <h2>Результат</h2>
+          <dl class="stats" id="stats"></dl>
+          <ul class="warnings" id="warnings"></ul>
+        </section>
+
+        <section class="group">
+          <h2>Скачать</h2>
+          <div class="exports">
+            <button class="primary" id="dl-dxf">Трафарет · DXF</button>
+            <button id="dl-svg">Трафарет · SVG</button>
+            <button id="print-part-a4" class="wide" title="Только одна деталь — вырезать шаблон и обвести на стали нужное число раз">Одна деталь на A4 (ручная резка)</button>
+            <button id="print-stencil-a4">Трафарет на A4</button>
+            <button id="print-stencil" title="Один лист во весь размер — для плоттера">Трафарет 1:1 (плоттер)</button>
+            <button id="print-template-a4">Шаблон ролика на A4</button>
+            <button id="dl-template">Шаблон ролика · SVG</button>
+            <button id="dl-template-dxf">Шаблон ролика · DXF</button>
+            <button id="dl-stl">3D-модель · STL</button>
+            <button id="share">Скопировать ссылку</button>
+            <button id="reset" class="ghost">Сбросить параметры</button>
+          </div>
+        </section>
+      </aside>
+
+      <main>
+        <section class="view3d" id="view3d">
+          <div class="toolbar">
+            <label class="bend">
+              <span>плоско</span>
+              <input type="range" id="bend" min="0" max="1" step="0.001" value="1" />
+              <span>на ролике</span>
+            </label>
+            <button id="roll" class="primary">▶ Прокатить</button>
+            <button id="fit" title="Вернуть камеру">⟲</button>
+          </div>
+        </section>
+        <section class="sheet">
+          <nav class="tabs" id="tabs">
+            <button data-tab="stencil">Трафарет лезвия</button>
+            <button data-tab="contour">Контур лаваша</button>
+            <button data-tab="template">Разметка ролика</button>
+            <span class="tab-info" id="tab-info"></span>
+          </nav>
+          <div class="tab-body">
+            <div class="pane" data-pane="stencil" id="pane-stencil"></div>
+            <div class="pane" data-pane="contour" id="pane-contour"></div>
+            <div class="pane" data-pane="template" id="pane-template"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
